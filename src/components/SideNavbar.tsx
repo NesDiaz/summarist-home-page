@@ -3,6 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { openAuthModal } from "@/redux/authSlice";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import type { RootState } from "@/redux/store";
 
 import {
   FiHome,
@@ -16,6 +21,17 @@ import {
 
 export default function SideNavbar() {
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    console.log("Logout successful!");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
 
   return (
     <nav className="sidebar">
@@ -53,7 +69,7 @@ export default function SideNavbar() {
             <div className="sidebar__text">My Library</div>
           </Link>
 
-          <div className="sidebar__item">
+          <div className="sidebar__item sidebar__item--disabled">
             <div></div>
 
             <div className="sidebar__icon">
@@ -63,7 +79,7 @@ export default function SideNavbar() {
             <div className="sidebar__text">Highlights</div>
           </div>
 
-          <div className="sidebar__item">
+          <div className="sidebar__item sidebar__item--disabled">
             <div></div>
 
             <div className="sidebar__icon">
@@ -86,7 +102,7 @@ export default function SideNavbar() {
             <div className="sidebar__text">Settings</div>
           </Link>
 
-          <div className="sidebar__item">
+          <div className="sidebar__item sidebar__item--disabled">
             <div></div>
 
             <div className="sidebar__icon">
@@ -96,14 +112,17 @@ export default function SideNavbar() {
             <div className="sidebar__text">Help & Support</div>
           </div>
 
-          <div className="sidebar__item">
+          <div
+  className="sidebar__item"
+ onClick={user ? handleLogout : () => dispatch(openAuthModal())}
+>
             <div></div>
 
             <div className="sidebar__icon">
               <FiLogOut />
             </div>
 
-            <div className="sidebar__text">Logout</div>
+            <div className="sidebar__text">{user ? "Logout" : "Login"}</div>
           </div>
         </div>
       </div>
