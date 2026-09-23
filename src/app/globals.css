@@ -1393,7 +1393,9 @@ button:disabled {
   text-decoration: none;
   cursor: pointer;
 }
-
+.sidebar__item--disabled {
+  cursor: not-allowed;
+}
 .sidebar__item > div:first-child {
   width: 5px;
   height: 100%;
@@ -1656,8 +1658,16 @@ button:disabled {
   color: #032b41;
 }
 .subscription__text{
-      color: #032b41;
-      margin-bottom: 30px;
+  color: #032b41;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+   
+}
+.subscription__text .btn {
+  width: 100px;
 }
 .settings__account{
   display: flex;
@@ -1672,4 +1682,27 @@ button:disabled {
 }
 .account__text{
   color: #032b41;
+}
+.settings__login--Wrapper{
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 40px auto;
+}
+.settings__loginText {
+  font-size: 24px;
+    font-weight: 700;
+    color: #032b41;
+    text-align: center;
+    margin-bottom: 24px;
+}
+.settings_btn {
+ width: 100px;
+}
+.settings-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
