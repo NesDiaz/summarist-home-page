@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -37,10 +38,31 @@ export default function SettingsPage() {
       } else {
         setSubscription(null);
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+      }, []);
+
+      if (loading) {
+  return (
+    <div className="container">
+      <main className="settings-page">
+        <h1 className="settings__title">Settings</h1>
+
+        <div className="settings__skeleton">
+          <div className="skeleton__line skeleton__line--short"></div>
+          <div className="skeleton__line skeleton__line--long"></div>
+
+          <div className="settings__skeleton--account">
+            <div className="skeleton__line skeleton__line--short"></div>
+            <div className="skeleton__line skeleton__line--long"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
 
   if (!user) {
     return (
