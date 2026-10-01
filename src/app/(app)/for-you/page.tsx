@@ -34,7 +34,8 @@ const dispatch = useDispatch();
 const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
 const [suggestedBooks, setSuggestedBooks] = useState<Book[]>([]);
- const [user, setUser] = useState<User | null>(null);
+const [user, setUser] = useState<User | null>(null);
+const [loading, setLoading] = useState(true);
 
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -107,10 +108,14 @@ const fetchSuggestedBooks = async () => {
   }
 };
 
-fetchSelectedBook();
-fetchRecommendedBooks();
-fetchSuggestedBooks();
-  }, []);
+Promise.all([
+  fetchSelectedBook(),
+  fetchRecommendedBooks(),
+  fetchSuggestedBooks(),
+]).finally(() => {
+  setLoading(false);
+});
+ }, []);
 
 
    const handleBookAccess = () => {
@@ -130,7 +135,10 @@ fetchSuggestedBooks();
   return (
     <main>
    <h1 className="selected-heading">Selected Just for you</h1>   
-{selectedBook && (
+{loading ? (
+  <div className="selected-book__skeleton"></div>
+) : (
+  selectedBook && (
   
 <section className="selected-book">
   <div className="selected-book__description">
@@ -169,15 +177,35 @@ fetchSuggestedBooks();
 
   </div>
 </section>
+  )
 )}
+
 <section className="recommended-books">
 <h2>Recommended For You</h2>
 <p className="recommended-books__subtitle">
   We think you&apos;ll like these
 </p>
 
-  <div className="recommended-books__list">
-    {recommendedBooks.map((book) => (
+  <div
+  className={
+    loading
+      ? "recommended-books__list recommended-books__list--loading"
+      : "recommended-books__list"
+  }
+>
+  {loading
+    ? Array.from({ length: 6 }).map((_, index) => (
+     <div
+  key={index}
+  className="recommended-book__skeleton"
+>
+  <div className="skeleton__image"></div>
+  <div className="skeleton__line skeleton__line--long"></div>
+  <div className="skeleton__line skeleton__line--medium"></div>
+  <div className="skeleton__line skeleton__line--short"></div>
+</div>
+      ))
+    : recommendedBooks.map((book) => (
 
 <div
   key={book.id}
@@ -191,8 +219,9 @@ fetchSuggestedBooks();
     <Image
       src={book.imageLink}
       alt={book.title}
-      width={120}
-      height={180}
+        width={180}
+  height={270}
+
     />
 {book.subscriptionRequired && (
       <span className="book-pill">Premium</span>
@@ -211,9 +240,26 @@ fetchSuggestedBooks();
 </section>
 <section className="suggested-books">
   <h2>Suggested Books</h2>
-
-  <div className="suggested-books__list">
-    {suggestedBooks.map((book) => (
+<div
+  className={
+    loading
+      ? "suggested-books__list suggested-books__list--loading"
+      : "suggested-books__list"
+  }
+>
+    {loading
+  ? Array.from({ length: 6 }).map((_, index) => (
+    <div
+  key={index}
+  className="suggested-book__skeleton"
+>
+  <div className="skeleton__image"></div>
+  <div className="skeleton__line skeleton__line--long"></div>
+  <div className="skeleton__line skeleton__line--medium"></div>
+  <div className="skeleton__line skeleton__line--short"></div>
+</div>
+    ))
+  : suggestedBooks.map((book) => (
       <div
         key={book.id}
         className="suggested-book"
@@ -225,8 +271,9 @@ fetchSuggestedBooks();
   <Image
     src={book.imageLink}
     alt={book.title}
-    width={120}
-    height={180}
+     width={180}
+  height={270}
+
   />
 
   {book.subscriptionRequired && (

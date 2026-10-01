@@ -10,9 +10,12 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import { closeAuthModal, setAuthMode } from "../redux/authSlice";
 import { auth } from "@/lib/firebase";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function AuthModal() {
   const dispatch = useDispatch();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { isAuthModalOpen, authMode } = useSelector(
     (state: RootState) => state.auth,
@@ -42,6 +45,10 @@ export default function AuthModal() {
       }
 
       dispatch(closeAuthModal());
+
+      if (pathname === "/") {
+        router.push("/for-you");
+      }
     } catch (error) {
       console.error("Authentication failed:", error);
     }
@@ -53,6 +60,10 @@ export default function AuthModal() {
       console.log("Guest login successful!");
 
       dispatch(closeAuthModal());
+
+      if (pathname === "/") {
+        router.push("/for-you");
+      }
     } catch (error) {
       console.error("Guest login failed:", error);
     }
@@ -76,46 +87,46 @@ export default function AuthModal() {
             : "Create an account to get started with Summarist."}
         </p>
 
-<form onSubmit={handleSubmit}>
-  {authMode === "register" && (
-    <input type="text" name="name" placeholder="Name" required />
-  )}
+        <form onSubmit={handleSubmit}>
+          {authMode === "register" && (
+            <input type="text" name="name" placeholder="Name" required />
+          )}
 
-  <input type="email" name="email" placeholder="Email" required />
+          <input type="email" name="email" placeholder="Email" required />
 
-  <input
-    type="password"
-    name="password"
-    placeholder="Password"
-    required
-  />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
 
-  <button type="submit" className="btn">
-    {authMode === "login" ? "Log in" : "Register"}
-  </button>
-</form>
+          <button type="submit" className="btn">
+            {authMode === "login" ? "Log in" : "Register"}
+          </button>
+        </form>
 
-<button
-  type="button"
-  className="auth__modal--switch"
-  onClick={() =>
-    dispatch(setAuthMode(authMode === "login" ? "register" : "login"))
-  }
->
-  {authMode === "login"
-    ? "Don't have an account? Register"
-    : "Already have an account? Log in"}
-</button>
+        <button
+          type="button"
+          className="auth__modal--switch"
+          onClick={() =>
+            dispatch(setAuthMode(authMode === "login" ? "register" : "login"))
+          }
+        >
+          {authMode === "login"
+            ? "Don't have an account? Register"
+            : "Already have an account? Log in"}
+        </button>
 
-{authMode === "login" && (
-  <button
-    type="button"
-    className="auth__modal--guest"
-    onClick={handleGuestLogin}
-  >
-    Continue as Guest
-  </button>
-)}
+        {authMode === "login" && (
+          <button
+            type="button"
+            className="auth__modal--guest"
+            onClick={handleGuestLogin}
+          >
+            Continue as Guest
+          </button>
+        )}
       </div>
     </div>
   );

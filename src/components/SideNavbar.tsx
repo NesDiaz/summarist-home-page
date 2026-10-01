@@ -34,7 +34,11 @@ export default function SideNavbar() {
 };
 
   return (
-    <nav className="sidebar">
+    <nav
+  className={`sidebar ${
+    pathname.startsWith("/player/") ? "sidebar--player" : ""
+  }`}
+>
       <div className="sidebar__logo">
         <Link href="/">
     <Image
