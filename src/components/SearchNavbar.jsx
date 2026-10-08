@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiMenu } from "react-icons/fi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function SearchNavbar() {
+export default function SearchNavbar({ onMenuClick, menuOpen }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [results, setResults] = useState([]);
@@ -129,6 +129,14 @@ export default function SearchNavbar() {
           results.length === 0 &&
           debouncedSearch && <div className="no__results">No books found</div>}
       </div>
+<button
+  type="button"
+  className="search__menu"
+  onClick={onMenuClick}
+  aria-label={menuOpen ? "Close menu" : "Open menu"}
+>
+  {menuOpen ? "✖" : <FiMenu />}
+</button>
     </div>
   );
 }
