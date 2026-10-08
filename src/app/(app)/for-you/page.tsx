@@ -140,7 +140,12 @@ Promise.all([
 ) : (
   selectedBook && (
   
-<section className="selected-book">
+<section
+  className="selected-book"
+  onClick={() => {
+    router.push(`/book/${selectedBook.id}`);
+  }}
+>
   <div className="selected-book__description">
     <p>{selectedBook.subTitle}</p>
   </div>

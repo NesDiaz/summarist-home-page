@@ -31,17 +31,21 @@ export default function ChoosePlanPage() {
           className={selectedPlan === "yearly" ? "plan plan--selected" : "plan"}
           onClick={() => setSelectedPlan("yearly")}
         >
-          <h2>Yearly</h2>
+          <h2 className="yearly-title">
+            Yearly
+            <span>7-day free trial</span>
+          </h2>
           <p>$79.99 / year</p>
         </button>
       </div>
 
-      <button 
-      type="button" 
-      className="choose-plan__button"
-      onClick={() => {
-        router.push(`/checkout?plan=${selectedPlan}`);
-      }}>
+      <button
+        type="button"
+        className="choose-plan__button"
+        onClick={() => {
+          router.push(`/checkout?plan=${selectedPlan}`);
+        }}
+      >
         Continue
       </button>
 

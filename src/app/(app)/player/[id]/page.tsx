@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { GrBackTen, GrForwardTen } from "react-icons/gr";
 import { FaPlay, FaPause } from "react-icons/fa";
-
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 type Book = {
   id: string;
   title: string;
@@ -96,9 +97,24 @@ export default function PlayerPage({
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
-    const handleEnded = () => {
-  setIsPlaying(false);
-};
+    const handleEnded = async () => {
+      setIsPlaying(false);
+
+      const currentUser = auth.currentUser;
+
+      if (!currentUser || !book) return;
+
+      try {
+        await setDoc(
+          doc(db, "users", currentUser.uid, "finishedBooks", book.id),
+          book,
+        );
+
+        console.log("Book added to finished books");
+      } catch (error) {
+        console.error("Error saving finished book:", error);
+      }
+    };
 
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
@@ -111,49 +127,49 @@ export default function PlayerPage({
     };
   }, [book]);
 
-if (loading) {
-  return (
-    <main className="player-page">
-      <section className="player__container">
-        <div className="player__skeleton-content">
-          <div className="skeleton__line skeleton__line--title"></div>
+  if (loading) {
+    return (
+      <main className="player-page">
+        <section className="player__container">
+          <div className="player__skeleton-content">
+            <div className="skeleton__line skeleton__line--title"></div>
 
-          <div className="skeleton__summary">
-            <div className="skeleton__line"></div>
-            <div className="skeleton__block"></div>
-            <div className="skeleton__block"></div>
-            <div className="skeleton__block"></div>
+            <div className="skeleton__summary">
+              <div className="skeleton__line"></div>
+              <div className="skeleton__block"></div>
+              <div className="skeleton__block"></div>
+              <div className="skeleton__block"></div>
             </div>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <div className="audio__container">
-        <div className="audio-book__section">
-          <div className="skeleton__audio-image"></div>
+        <div className="audio__container">
+          <div className="audio-book__section">
+            <div className="skeleton__audio-image"></div>
 
-          <div className="audio-book__details">
-            <div className="skeleton__audio-title"></div>
-            <div className="skeleton__audio-author"></div>
+            <div className="audio-book__details">
+              <div className="skeleton__audio-title"></div>
+              <div className="skeleton__audio-author"></div>
+            </div>
+          </div>
+
+          <div className="audio__wrapper">
+            <div className="audio__controls">
+              <div className="skeleton__audio-button"></div>
+              <div className="skeleton__audio-play"></div>
+              <div className="skeleton__audio-button"></div>
+            </div>
+          </div>
+
+          <div className="audio__progress">
+            <div className="skeleton__audio-time"></div>
+            <div className="skeleton__audio-bar"></div>
+            <div className="skeleton__audio-time"></div>
           </div>
         </div>
-
-        <div className="audio__wrapper">
-          <div className="audio__controls">
-            <div className="skeleton__audio-button"></div>
-            <div className="skeleton__audio-play"></div>
-            <div className="skeleton__audio-button"></div>
-          </div>
-        </div>
-
-        <div className="audio__progress">
-          <div className="skeleton__audio-time"></div>
-          <div className="skeleton__audio-bar"></div>
-          <div className="skeleton__audio-time"></div>
-        </div>
-      </div>
-    </main>
-  );
-}
+      </main>
+    );
+  }
   if (!book) {
     return <p>Loading...</p>;
   }
@@ -207,17 +223,17 @@ if (loading) {
             <span className="audio__time">{formatTime(currentTime)}</span>
 
             <input
-  className="time__bar"
-  type="range"
-  min="0"
-  max={duration}
-  value={currentTime}
-  onChange={(e) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Number(e.target.value);
-    }
-  }}
-/>
+              className="time__bar"
+              type="range"
+              min="0"
+              max={duration}
+              value={currentTime}
+              onChange={(e) => {
+                if (audioRef.current) {
+                  audioRef.current.currentTime = Number(e.target.value);
+                }
+              }}
+            />
             <span className="audio__time">{formatTime(duration)}</span>
           </div>
 

@@ -17,68 +17,107 @@ type Book = {
 };
 
 export default function LibraryPage() {
-    const [books, setBooks] = useState<Book[]>([]);
-    const router = useRouter();
+  const [books, setBooks] = useState<Book[]>([]);
+  const [finishedBooks, setFinishedBooks] = useState<Book[]>([]);
+  const router = useRouter();
 
-    useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    if (!currentUser) {
-      return;
-    }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        return;
+      }
 
-    try {
-      const libraryRef = collection(db, "users", currentUser.uid, "library");
-      const snapshot = await getDocs(libraryRef);
+      try {
+        const libraryRef = collection(db, "users", currentUser.uid, "library");
+        const finishedBooksRef = collection(
+          db,
+          "users",
+          currentUser.uid,
+          "finishedBooks",
+        );
 
-      const savedBooks = snapshot.docs.map((doc) => doc.data() as Book);
+        const snapshot = await getDocs(libraryRef);
+        const finishedSnapshot = await getDocs(finishedBooksRef);
 
-      setBooks(savedBooks);
-    } catch (error) {
-      console.error("Error fetching library:", error);
-    }
-  });
+        const savedBooks = snapshot.docs.map((doc) => doc.data() as Book);
+        const finishedBooks = finishedSnapshot.docs.map(
+          (doc) => doc.data() as Book,
+        );
 
-  return () => unsubscribe();
-}, []);
+        setBooks(savedBooks);
+        setFinishedBooks(finishedBooks);
+      } catch (error) {
+        console.error("Error fetching library:", error);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <main className="library-page">
-      <h1>My Library</h1>
-
       <section className="library-section">
-        <h2>Saved Books</h2>
+        <h2>Saved Books </h2>
+        <div className="book__count">{books.length} items</div>
         {books.length === 0 ? (
-  <p>You haven&apos;t saved any books yet.</p>
-) : (
-  <div className="library-books">
-    {books.map((book) => (
-      <div
-  key={book.id}
-  className="library-book book-image"
-  onClick={() => {
-    router.push(`/book/${book.id}`);
-  }}
->
-        <Image
-          src={book.imageLink}
-          alt={book.title}
-          width={180}
-          height={270}
-        />
+          <p>You haven&apos;t saved any books yet.</p>
+        ) : (
+          <div className="library-books">
+            {books.map((book) => (
+              <div
+                key={book.id}
+                className="library-book book-image"
+                onClick={() => {
+                  router.push(`/book/${book.id}`);
+                }}
+              >
+                <Image
+                  src={book.imageLink}
+                  alt={book.title}
+                  width={180}
+                  height={270}
+                />
 
-        <h3>{book.title}</h3>
-        <p>{book.author}</p>
-        <p>{book.subTitle}</p>
-        <p>⭐ {book.averageRating}</p>
-      </div>
-    ))}
-  </div>
-)}
+                <h3>{book.title}</h3>
+                <p>{book.author}</p>
+                <p>{book.subTitle}</p>
+                <p>⭐ {book.averageRating}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="library-section">
         <h2>Finished Books</h2>
-        <p>You haven&apos;t finished any books yet.</p>
+        <div className="book__count">{finishedBooks.length} items</div>
+        {finishedBooks.length === 0 ? (
+          <p>You haven&apos;t finished any books yet.</p>
+        ) : (
+          <div className="library-books">
+            {finishedBooks.map((book) => (
+              <div
+                key={book.id}
+                className="library-book book-image"
+                onClick={() => {
+                  router.push(`/book/${book.id}`);
+                }}
+              >
+                <Image
+                  src={book.imageLink}
+                  alt={book.title}
+                  width={180}
+                  height={270}
+                />
+
+                <h3>{book.title}</h3>
+                <p>{book.author}</p>
+                <p>{book.subTitle}</p>
+                <p>⭐ {book.averageRating}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );

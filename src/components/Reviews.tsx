@@ -1,6 +1,33 @@
+"use client"
+
+import { auth } from "@/lib/firebase";
+import { openAuthModal } from "@/redux/authSlice";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { BsStarFill } from "react-icons/bs";
+import { useDispatch } from "react-redux";
 
 export default function Reviews() {
+  const dispatch = useDispatch();
+  const [user, setUser] = useState(auth.currentUser);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("Logout successful!");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <section id="reviews">
       <div className="row">
@@ -79,7 +106,12 @@ export default function Reviews() {
           </div>
 
           <div className="reviews__btn--wrapper">
-            <button className="btn home__cta--btn">Login</button>
+<button
+  className="btn home__cta--btn"
+  onClick={user ? handleLogout : () => dispatch(openAuthModal())}
+>
+  {user ? "Logout" : "Login"}
+</button>
           </div>
         </div>
       </div>
