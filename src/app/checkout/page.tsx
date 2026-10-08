@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan");
@@ -24,16 +25,26 @@ export default function CheckoutPage() {
             {isYearly ? "$79.99 / year" : "$9.99 / month"}
           </p>
 
-          {isYearly && <p className="checkout__trial">7-day free trial</p>}
+          {isYearly && (
+            <p className="checkout__trial">7-day free trial</p>
+          )}
         </div>
 
         <button
-  className="checkout__button"
-  onClick={() => router.push(`/payment?plan=${plan}`)}
->
-  Continue to Payment
-</button>
+          className="checkout__button"
+          onClick={() => router.push(`/payment?plan=${plan}`)}
+        >
+          Continue to Payment
+        </button>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

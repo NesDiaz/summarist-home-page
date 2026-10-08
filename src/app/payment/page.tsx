@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createCheckoutSession } from "@invertase/firestore-stripe-payments";
 import { payments } from "@/lib/stripePayments";
@@ -9,7 +9,7 @@ import { auth } from "@/lib/firebase";
 const MONTHLY_PRICE_ID = "price_1UFiAoBlbEV2wT4q5RqOgw2v";
 const YEARLY_PRICE_ID = "price_1UFiKwBlbEV2wT4qJvbGQUmq";
 
-export default function PaymentPage() {
+function PaymentContent() {
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan");
   const router = useRouter();
@@ -74,5 +74,13 @@ export default function PaymentPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={null}>
+      <PaymentContent />
+    </Suspense>
   );
 }
